@@ -1,65 +1,123 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { patientData } from "@/data/patients";
+
+export default function Dashboard() {
+  const totalWeeklySessions = patientData.reduce((sum, p) => sum + p.weekSessions, 0);
+  const avgDailyTime = Math.round(
+    patientData.reduce((sum, p) => sum + p.avgTimeMins, 0) / patientData.length
+  );
+  const avgImprovement = Math.round(
+    patientData.reduce((sum, p) => sum + (p.scoreNow - p.scoreBefore), 0) / patientData.length
+  );
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
+      <header className="rounded-3xl border border-border bg-surface/90 p-5 shadow-sm backdrop-blur sm:p-7">
+        <p className="text-sm font-bold tracking-[0.18em] text-primary">PHYSIO MONITOR</p>
+        <div className="mt-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Home Rehab Dashboard
+            </h1>
+            <p className="mt-2 max-w-2xl text-base text-foreground/75">
+              Monitor your patients&apos; at-home training progress, game performance, and session frequency.
+            </p>
+          </div>
+          <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-sm font-bold text-primary">
+            Active Patients: {patientData.length}
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p className="text-sm font-bold text-foreground/70">Total Weekly Sessions</p>
+          <p className="mt-2 text-3xl font-bold text-primary">{totalWeeklySessions}</p>
+          <p className="mt-2 text-sm text-foreground/65">All patients combined</p>
+        </article>
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p className="text-sm font-bold text-foreground/70">Average Daily Rehab Time</p>
+          <p className="mt-2 text-3xl font-bold text-primary">{avgDailyTime} mins</p>
+          <p className="mt-2 text-sm text-foreground/65">Per patient session</p>
+        </article>
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p className="text-sm font-bold text-foreground/70">Average Performance Gain</p>
+          <p className="mt-2 text-3xl font-bold text-primary">+{avgImprovement}</p>
+          <p className="mt-2 text-sm text-foreground/65">Game score points improved</p>
+        </article>
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p className="text-sm font-bold text-foreground/70">Adherence Level</p>
+          <p className="mt-2 text-3xl font-bold text-primary">87%</p>
+          <p className="mt-2 text-sm text-foreground/65">Meeting targets</p>
+        </article>
+      </section>
+
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Your Patients&apos;</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {patientData.map((patient) => {
+            const improvementPercentage = Math.round(
+              ((patient.scoreNow - patient.scoreBefore) / patient.scoreBefore) * 100
+            );
+            const lastSession = patient.gameHistory[0];
+
+            return (
+              <Link key={patient.id} href={`/patients/${patient.id}`}>
+                <article className="group cursor-pointer rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all hover:border-primary hover:shadow-md">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary">
+                        {patient.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-foreground/70">{patient.condition}</p>
+                      <p className="mt-1 text-xs text-foreground/60">Age: {patient.age}</p>
+                    </div>
+                    <div className="rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary">
+                      +{improvementPercentage}%
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border/50 pt-4">
+                    <div>
+                      <p className="text-xs text-foreground/60">Weekly Sessions</p>
+                      <p className="mt-1 text-xl font-bold text-foreground">
+                        {patient.weekSessions}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-foreground/60">Avg Time</p>
+                      <p className="mt-1 text-xl font-bold text-foreground">
+                        {patient.avgTimeMins}m
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-foreground/60">Latest Score</p>
+                      <p className="mt-1 text-xl font-bold text-primary">{patient.scoreNow}</p>
+                    </div>
+                  </div>
+
+                  {lastSession && (
+                    <div className="mt-4 rounded-lg bg-surface-soft p-3">
+                      <p className="text-xs text-foreground/70">
+                        Last session: <span className="font-bold">{lastSession.date}</span>
+                      </p>
+                      <p className="mt-1 text-xs text-foreground/70">
+                        {lastSession.exerciseType} • {lastSession.duration} mins
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center text-sm font-bold text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    View Details →
+                  </div>
+                </article>
+              </Link>
+            );
+          })}
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
