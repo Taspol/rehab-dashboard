@@ -269,7 +269,7 @@ public class BalanceGameController : MonoBehaviour
 Check the uploaded data by opening the dev console:
 ```javascript
 // In browser console
-fetch('/api/game-sessions?patientId=p001')
+fetch('/api/sessions?patientId=p001')
   .then(r => r.json())
   .then(data => console.log(data.sessions))
 ```

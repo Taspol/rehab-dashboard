@@ -88,7 +88,7 @@ void OnGameEnd()
 Open browser developer tools (F12):
 ```javascript
 // Console - check recent uploads
-fetch('http://localhost:3000/api/game-sessions?patientId=p001')
+fetch('http://localhost:3000/api/sessions?patientId=p001')
   .then(r => r.json())
   .then(d => console.log(d.sessions))
 ```

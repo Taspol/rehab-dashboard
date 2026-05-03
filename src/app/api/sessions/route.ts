@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate session data
     if (
       !session.date ||
       !session.duration ||
@@ -47,14 +46,14 @@ export async function POST(request: NextRequest) {
         },
         { status: 201 }
       );
-    } else {
-      return NextResponse.json(
-        { error: "Failed to save game session" },
-        { status: 500 }
-      );
     }
+
+    return NextResponse.json(
+      { error: "Failed to save game session" },
+      { status: 500 }
+    );
   } catch (error) {
-    console.error("Error in POST /api/game-sessions:", error);
+    console.error("Error in POST /api/sessions:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -82,7 +81,7 @@ export async function GET(request: NextRequest) {
       count: sessions.length,
     });
   } catch (error) {
-    console.error("Error in GET /api/game-sessions:", error);
+    console.error("Error in GET /api/sessions:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

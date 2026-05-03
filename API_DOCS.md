@@ -19,7 +19,7 @@ Currently, no authentication is required. This should be added for production us
 
 ### 1. Upload Game Session
 
-**Endpoint:** `POST /api/game-sessions`
+**Endpoint:** `POST /api/sessions`
 
 Upload a completed rehabilitation game session for a patient.
 
@@ -83,7 +83,7 @@ Upload a completed rehabilitation game session for a patient.
 
 ### 2. Get Patient Sessions
 
-**Endpoint:** `GET /api/game-sessions?patientId=p001`
+**Endpoint:** `GET /api/sessions?patientId=p001`
 
 Retrieve all game sessions for a specific patient.
 

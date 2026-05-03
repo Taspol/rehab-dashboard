@@ -54,7 +54,7 @@ export async function uploadGameSession(
   patientId: string,
   session: Omit<GameSession, "">
 ): Promise<UploadResponse> {
-  const response = await fetch(`${API_BASE}/api/game-sessions`, {
+  const response = await fetch(`${API_BASE}/api/sessions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -116,7 +116,7 @@ export async function getPatientDetails(patientId: string) {
  * @returns Array of game sessions sorted by date (newest first)
  */
 export async function getPatientSessions(patientId: string): Promise<GameSession[]> {
-  const response = await fetch(`${API_BASE}/api/game-sessions?patientId=${patientId}`);
+  const response = await fetch(`${API_BASE}/api/sessions?patientId=${patientId}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch patient sessions");

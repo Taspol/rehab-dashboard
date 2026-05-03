@@ -125,7 +125,7 @@ public class DashboardAPIClient : MonoBehaviour
 
         // Create HTTP request
         using (UnityWebRequest request = new UnityWebRequest(
-            $"{apiBaseURL}/api/game-sessions",
+            $"{apiBaseURL}/api/sessions",
             "POST"
         ))
         {
@@ -195,7 +195,7 @@ public class DashboardAPIClient : MonoBehaviour
     )
     {
         using (UnityWebRequest request = UnityWebRequest.Get(
-            $"{apiBaseURL}/api/game-sessions?patientId={patientId}"
+            $"{apiBaseURL}/api/sessions?patientId={patientId}"
         ))
         {
             yield return request.SendWebRequest();
