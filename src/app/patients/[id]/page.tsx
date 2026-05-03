@@ -1,19 +1,19 @@
-"use client";
-
 import Link from "next/link";
-import { getPatientById } from "@/data/patients";
-import { useParams } from "next/navigation";
+import { getUploadedPatients } from "@/lib/patientCatalog";
 
-export default function PatientDetailPage() {
-  const params = useParams();
-  const patientId = params.id as string;
-  const patient = getPatientById(patientId);
+type PatientDetailPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function PatientDetailPage({ params }: PatientDetailPageProps) {
+  const { id: patientId } = await params;
+  const patient = (await getUploadedPatients()).find((entry) => entry.id === patientId);
 
   if (!patient) {
     return (
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
         <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
-          <p className="text-foreground">Patient not found</p>
+          <p className="text-foreground">Patient not found in uploaded data</p>
           <Link href="/" className="mt-4 text-primary hover:underline">
             ← Back to Dashboard
           </Link>

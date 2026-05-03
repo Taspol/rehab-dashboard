@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllPatients, getPatientById } from "@/data/patients";
+import { getUploadedPatients } from "@/lib/patientCatalog";
 
 export async function GET(request: NextRequest) {
   try {
     const patientId = request.nextUrl.searchParams.get("id");
 
     if (patientId) {
-      // Get specific patient
-      const patient = getPatientById(patientId);
+      const patients = await getUploadedPatients();
+      const patient = patients.find((entry) => entry.id === patientId);
+
       if (!patient) {
         return NextResponse.json(
           { error: "Patient not found" },
@@ -16,14 +17,18 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json(patient);
     } else {
-      // Get all patients
-      const patients = getAllPatients();
+      const patients = await getUploadedPatients();
       return NextResponse.json({
         patients: patients.map((p) => ({
           id: p.id,
           name: p.name,
           condition: p.condition,
           age: p.age,
+          weekSessions: p.weekSessions,
+          avgTimeMins: p.avgTimeMins,
+          scoreBefore: p.scoreBefore,
+          scoreNow: p.scoreNow,
+          gameHistory: p.gameHistory,
         })),
         count: patients.length,
       });

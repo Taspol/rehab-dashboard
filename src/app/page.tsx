@@ -1,16 +1,20 @@
-"use client";
-
 import Link from "next/link";
-import { patientData } from "@/data/patients";
+import { getUploadedPatients } from "@/lib/patientCatalog";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const patientData = await getUploadedPatients();
+  const hasPatients = patientData.length > 0;
+
   const totalWeeklySessions = patientData.reduce((sum, p) => sum + p.weekSessions, 0);
-  const avgDailyTime = Math.round(
-    patientData.reduce((sum, p) => sum + p.avgTimeMins, 0) / patientData.length
-  );
-  const avgImprovement = Math.round(
-    patientData.reduce((sum, p) => sum + (p.scoreNow - p.scoreBefore), 0) / patientData.length
-  );
+  const avgDailyTime = hasPatients
+    ? Math.round(patientData.reduce((sum, p) => sum + p.avgTimeMins, 0) / patientData.length)
+    : 0;
+  const avgImprovement = hasPatients
+    ? Math.round(
+        patientData.reduce((sum, p) => sum + (p.scoreNow - p.scoreBefore), 0) /
+          patientData.length
+      )
+    : 0;
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
@@ -56,8 +60,13 @@ export default function Dashboard() {
 
       <section>
         <h2 className="mb-4 text-2xl font-bold text-foreground">Your Patients&apos;</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {patientData.map((patient) => {
+        {!hasPatients ? (
+          <div className="rounded-2xl border border-dashed border-border bg-surface/70 p-8 text-center text-foreground/70">
+            No uploaded patients yet. Once a game sends session data to <span className="font-bold">/api/sessions</span>, the patient card will appear here.
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {patientData.map((patient) => {
             const improvementPercentage = Math.round(
               ((patient.scoreNow - patient.scoreBefore) / patient.scoreBefore) * 100
             );
@@ -115,8 +124,9 @@ export default function Dashboard() {
                 </article>
               </Link>
             );
-          })}
-        </div>
+            })}
+          </div>
+        )}
       </section>
     </main>
   );

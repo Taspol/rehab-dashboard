@@ -2,37 +2,80 @@ import { NextRequest, NextResponse } from "next/server";
 import { saveGameSession } from "@/lib/fileStorage";
 import { GameSession } from "@/types/patient";
 
+type SessionInput = Partial<GameSession> & {
+  level?: number;
+  durationMinutes?: number | string;
+  durationSeconds?: number | string;
+  rehabType?: string;
+};
+
+function toNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+function normalizeDuration(session: SessionInput): number | null {
+  const directDuration = toNumber(session.duration);
+  if (directDuration !== null && directDuration > 0) {
+    return directDuration;
+  }
+
+  const minutes = toNumber(session.durationMinutes);
+  if (minutes !== null && minutes > 0) {
+    return minutes;
+  }
+
+  const seconds = toNumber(session.durationSeconds);
+  if (seconds !== null && seconds > 0) {
+    return Math.max(1, Math.round(seconds / 60));
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { patientId, session } = body;
+    const patientId = body.patientId ?? body.patientld;
+    const session: SessionInput = body.session ?? body;
 
-    if (!patientId || !session) {
+    if (!patientId) {
       return NextResponse.json(
-        { error: "Missing patientId or session data" },
+        { error: "Missing patientId (or patientld)" },
         { status: 400 }
       );
     }
 
-    if (
-      !session.date ||
-      !session.duration ||
-      session.score === undefined ||
-      !session.gameName ||
-      !session.exerciseType
-    ) {
+    const gameName = session.gameName?.trim();
+    const exerciseType = session.exerciseType?.trim() ?? session.rehabType?.trim();
+    const date = session.date?.trim() ?? new Date().toISOString().slice(0, 10);
+    const duration = normalizeDuration(session);
+    const score = toNumber(session.score);
+
+    if (!gameName || !exerciseType || duration === null || score === null) {
       return NextResponse.json(
-        { error: "Invalid session data. Required fields: date, duration, score, gameName, exerciseType" },
+        {
+          error:
+            "Invalid session data. Required fields: gameName, exerciseType (or rehabType), score, and durationMinutes or durationSeconds or duration",
+        },
         { status: 400 }
       );
     }
 
     const sessionData: GameSession = {
-      date: session.date,
-      duration: parseInt(session.duration),
-      score: parseInt(session.score),
-      gameName: session.gameName,
-      exerciseType: session.exerciseType,
+      date,
+      duration,
+      score,
+      gameName,
+      exerciseType,
     };
 
     const success = await saveGameSession(patientId, sessionData);
